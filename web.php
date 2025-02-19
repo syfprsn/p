@@ -1,16 +1,10 @@
 <?php
 
-use App\Http\Controllers\Authcontroller;
-use App\Http\Controllers\Dashboardcontroller;
-use App\Http\Controllers\landingController;
-use App\Http\Controllers\Ongkircontroller;
-use App\Http\Controllers\Penggunacontroller;
-use App\Http\Controllers\Produkcontroller;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\AdminController;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\TokoController;
 use Illuminate\Support\Facades\Route;
-use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,33 +16,22 @@ use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::get('/',[landingController::class,'index'])->name('landing');
 
-
-Route::get("/login",[Authcontroller::class,'index' ])->name('login');
-Route::post("/login",[Authcontroller::class,'authenticate' ])->name('login.post');
-Route::get('/logout',[Authcontroller::class,'logout'])->name('logout');
-
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard',[Dashboardcontroller::class,'index'])->name('dashboard');
-    Route::get('/landing',[landingcontroller::class,'index'])->name('landing');
-    Route::get('/pelanggan',[Penggunacontroller::class,'index'])->name('pengguna');
-    Route::get('/produk',[Produkcontroller::class,'index'])->name('produk');
-    Route::get('/ongkir',[Ongkircontroller::class,'index'])->name('ongkir');
-    Route::post('/cart/add/{id}', [CartController::class, 'addToCart'])->name('cart.add');
-    Route::get('/cart', [CartController::class, 'viewCart'])->name('cart.view');
-    Route::post('/cart/update/{id}', [CartController::class, 'updateCart'])->name('cart.update');
-    Route::post('/cart/remove/{id}', [CartController::class, 'removeFromCart'])->name('cart.remove');
-    Route::get('/checkout', [CartController::class, 'checkoutView'])->name('checkout.view');
-    Route::post('/checkout', [CartController::class, 'processCheckout'])->name('checkout.process');
-    Route::get('/payment/{id}', [CartController::class, 'paymentView'])->name('payment.view');
-    Route::post('/payment/{id}', [CartController::class, 'processPayment'])->name('payment.process');
-    Route::get('/receipt/{id}', [CartController::class, 'receiptView'])->name('receipt.view');
-    Route::post('/admin/approve-payment/{id}', [AdminController::class, 'approvePayment'])->name('admin.approvePayment');
-
+Route::get('/', function () {
+    return redirect()->route('login');
 });
 
+Route::get('/login',[LoginController::class,'index'])->name('login');
+Route::post('/login',[LoginController::class,'authenticate'])->name('login.post');
+Route::get('/logout',[LoginController::class,'logout'])->name('logout');
 
+Route::get('/dashboard',[DashboardController::class,'index']);
+Route::get('/toko',[TokoController::class,'index']);
 
+Route::resource('pelanggan',LoginController::class)->except(['show']);
+Route::get('/indexcreate', [LoginController::class, 'indexcreate'])->name('pelanggan.indexcreate');
+Route::get('/register', [LoginController::class, 'register'])->name('pelanggan.register');
+Route::post('/update', [LoginController::class, 'update'])->name('pelanggan.update');
 
+Route::resource('produk',ProdukController::class)->except(['show']);
+Route::post('/update', [ProdukController::class, 'update'])->name('produk.update');
